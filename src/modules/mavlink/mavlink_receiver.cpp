@@ -917,8 +917,11 @@ MavlinkReceiver::handle_message_set_position_target_local_ned(mavlink_message_t 
 
 		bool is_takeoff_sp = (bool)(set_position_target_local_ned.type_mask & 0x1000);
 		bool is_land_sp = (bool)(set_position_target_local_ned.type_mask & 0x2000);
-		bool is_loiter_sp = (bool)(set_position_target_local_ned.type_mask & 0x3000);
-		bool is_idle_sp = (bool)(set_position_target_local_ned.type_mask & 0x4000);
+		// bool is_loiter_sp = (bool)(set_position_target_local_ned.type_mask & 0x3000);
+		// bool is_idle_sp = (bool)(set_position_target_local_ned.type_mask & 0x4000);
+		bool is_loiter_sp = (bool)(set_position_target_local_ned.type_mask & 0x4000);
+		bool is_idle_sp = (bool)(set_position_target_local_ned.type_mask & 0x8000);
+
 
 		offboard_control_mode.timestamp = hrt_absolute_time();
 
@@ -970,6 +973,11 @@ MavlinkReceiver::handle_message_set_position_target_local_ned(mavlink_message_t 
 					} else {
 						pos_sp_triplet.current.type = position_setpoint_s::SETPOINT_TYPE_POSITION;
 					}
+
+					
+					printf("mavlink_receiver(is_loiter_sp):%i\n",is_loiter_sp);
+					printf("mavlink_receiver(is_loiter_sp):%i\n",is_idle_sp);
+					printf("mavlink_receiver(pos_sp_triplet.current.type):%d\n",pos_sp_triplet.current.type);
 
 					/* set the local pos values */
 					if (!offboard_control_mode.ignore_position) {

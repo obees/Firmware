@@ -209,4 +209,9 @@ private:
 	 */
 	void		task_main();
 
+
+	// GPS Transformation
+	map_projection_reference_s _map_proj_ref{};
+
+
 };

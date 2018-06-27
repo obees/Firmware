@@ -15,6 +15,31 @@ then
 
 	param set MIS_LTRMIN_ALT 0.01
 	param set MIS_TAKEOFF_ALT 0.01
+
+	# new oli
+	# for rover
+	param set NAV_RCL_ACT 0
+	param set RC_FAILS_THR 0
+
+	# Using lpe + q estimators
+	param set SYS_MC_EST_GROUP 1
+
+	# disable air speed checks
+	param set CBRK_AIRSPD_CHK 162128
+
+	# offboard settings
+	param set SYS_COMPANION 921600
+
+	# mocap
+	param set ATT_EXT_HDG_M 2
+
+	# fake_gps
+	param set MAV_USEHILGPS 1
+
+	#lpe_fusion only gps
+	param set LPE_FUSION 1
+
+
 fi
 
 # Enable servo output on pins 3 and 4 (steering and thrust)

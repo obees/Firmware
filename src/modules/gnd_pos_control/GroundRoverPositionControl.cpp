@@ -219,8 +219,11 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 	bool setpoint = true;
 
 	if (_control_mode.flag_control_auto_enabled && pos_sp_triplet.current.valid) {
-		/* AUTONOMOUS FLIGHT */
+			/* AUTONOMOUS FLIGHT */
 
+	//if (_control_mode.flag_control_offboard_enabled && pos_sp_triplet.current.valid) {
+			/* AUTONOMOUS FLIGHT */
+	
 		_control_mode_current = UGV_POSCTRL_MODE_AUTO;
 
 		/* get circle mode */
@@ -229,6 +232,7 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 		/* current waypoint (the one currently heading for) */
 		matrix::Vector2f curr_wp((float)pos_sp_triplet.current.lat, (float)pos_sp_triplet.current.lon);
 
+		// printf("%F\n",pos_sp_triplet.current.lat);
 		/* previous waypoint */
 		matrix::Vector2f prev_wp = curr_wp;
 
@@ -310,7 +314,103 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 			_att_sp.yaw_reset_integral = true;
 		}
 
-	} else {
+	} 
+	else if (_control_mode.flag_control_offboard_enabled && pos_sp_triplet.current.valid){	
+	 		 /* OFFBOARD CONTROLLED FLIGHT */ 
+
+		//printf("%d\n",pos_sp_triplet.current.type);
+
+		_control_mode_current = UGV_POSCTRL_MODE_OTHER;
+
+		/* get circle mode */
+		bool was_circle_mode = _gnd_control.circle_mode();
+
+		/* current waypoint (the one currently heading for) */
+		matrix::Vector2f curr_wp((float)pos_sp_triplet.current.lat, (float)pos_sp_triplet.current.lon);
+
+		matrix::Vector2f prev_wp = curr_wp;
+
+		if (pos_sp_triplet.previous.valid) {
+			prev_wp(0) = (float)pos_sp_triplet.previous.lat;
+			prev_wp(1) = (float)pos_sp_triplet.previous.lon;
+		}
+
+		matrix::Vector2f ground_speed_2d = {ground_speed(0), ground_speed(1)};
+
+		float mission_throttle = _parameters.throttle_cruise;
+
+		/* Just control the throttle */
+		if (_parameters.speed_control_mode == 1) {
+			/* control the speed in closed loop */
+
+			float mission_target_speed = _parameters.gndspeed_trim;
+
+			if (PX4_ISFINITE(_pos_sp_triplet.current.cruising_speed) &&
+			    _pos_sp_triplet.current.cruising_speed > 0.1f) {
+				mission_target_speed = _pos_sp_triplet.current.cruising_speed;
+			}
+
+			// Velocity in body frame
+			const Dcmf R_to_body(Quatf(_sub_attitude.get().q).inversed());
+			const Vector3f vel = R_to_body * Vector3f(ground_speed(0), ground_speed(1), ground_speed(2));
+
+			const float x_vel = vel(0);
+			const float x_acc = _sub_sensors.get().accel_x;
+
+			// Compute airspeed control out and just scale it as a constant
+			mission_throttle = _parameters.throttle_speed_scaler
+					   * pid_calculate(&_speed_ctrl, mission_target_speed, x_vel, x_acc, dt);
+
+			// Constrain throttle between min and max
+			mission_throttle = math::constrain(mission_throttle, _parameters.throttle_min, _parameters.throttle_max);
+
+		} else {
+			/* Just control throttle in open loop */
+			if (PX4_ISFINITE(_pos_sp_triplet.current.cruising_throttle) &&
+			    _pos_sp_triplet.current.cruising_throttle > 0.01f) {
+
+				mission_throttle = _pos_sp_triplet.current.cruising_throttle;
+			}
+		}
+
+	 	
+	 	if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_IDLE) {
+			_att_sp.roll_body = 0.0f;
+			_att_sp.pitch_body = 0.0f;
+			_att_sp.yaw_body = 0.0f;
+			_att_sp.thrust = 0.0f;
+			printf("%d\n",position_setpoint_s::SETPOINT_TYPE_IDLE);
+
+		} else if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_POSITION) {
+
+	 		/* waypoint is a plain navigation waypoint or the takeoff waypoint, does not matter */
+			_gnd_control.navigate_waypoints(prev_wp, curr_wp, current_position, ground_speed_2d);
+			_att_sp.roll_body = _gnd_control.nav_roll();
+			_att_sp.pitch_body = 0.0f;
+			_att_sp.yaw_body = _gnd_control.nav_bearing();
+			_att_sp.fw_control_yaw = true;
+			_att_sp.thrust = mission_throttle;
+
+	 	}  else if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_LOITER) {
+
+			/* waypoint is a loiter waypoint so we want to stop*/
+			_gnd_control.navigate_loiter(curr_wp, current_position, pos_sp_triplet.current.loiter_radius,
+						     pos_sp_triplet.current.loiter_direction, ground_speed_2d);
+
+			_att_sp.roll_body = _gnd_control.nav_roll();
+			_att_sp.pitch_body = 0.0f;
+			_att_sp.yaw_body = _gnd_control.nav_bearing();
+			_att_sp.fw_control_yaw = true;
+			_att_sp.thrust = 0.0f;
+		}
+
+	 	if (was_circle_mode && !_gnd_control.circle_mode()) {
+			/* just kicked out of loiter, reset integrals */
+			_att_sp.yaw_reset_integral = true;
+		}
+
+	} 
+	else {
 		_control_mode_current = UGV_POSCTRL_MODE_OTHER;
 
 		_att_sp.roll_body = 0.0f;
@@ -358,6 +458,8 @@ GroundRoverPositionControl::task_main()
 	fds[1].events = POLLIN;
 
 	_task_running = true;
+
+	map_projection_init(&_map_proj_ref, 47.397742, 8.545594);
 
 	while (!_task_should_exit) {
 
@@ -409,6 +511,22 @@ GroundRoverPositionControl::task_main()
 
 			manual_control_setpoint_poll();
 			position_setpoint_triplet_poll();
+
+			// update _pos_sp_triplet with lat lon from x,y when missing to enable missions relying on gps
+			if (_pos_sp_triplet.current.lat < 0.1){
+										
+				double lat = 0;
+				double lon = 0;
+				
+				map_projection_reproject(&_map_proj_ref, _pos_sp_triplet.current.x, _pos_sp_triplet.current.y, &lat, &lon);
+
+				_pos_sp_triplet.current.lat = lat;
+				_pos_sp_triplet.current.lon = lon;
+			
+				//printf("%f", lat);
+				//printf("%f", lon);
+			}
+
 			_sub_attitude.update();
 			_sub_sensors.update();
 
