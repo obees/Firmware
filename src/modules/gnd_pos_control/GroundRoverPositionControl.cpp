@@ -384,7 +384,7 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 			_att_sp.pitch_body = 0.0f;
 			_att_sp.yaw_body = 0.0f;
 			_att_sp.thrust = 0.0f;
-			printf("%d\n",position_setpoint_s::SETPOINT_TYPE_IDLE);
+			//printf("%d\n",position_setpoint_s::SETPOINT_TYPE_IDLE);
 
 		} else if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_POSITION) {
 

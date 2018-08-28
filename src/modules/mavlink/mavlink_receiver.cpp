@@ -975,9 +975,9 @@ MavlinkReceiver::handle_message_set_position_target_local_ned(mavlink_message_t 
 					}
 
 					
-					printf("mavlink_receiver(is_loiter_sp):%i\n",is_loiter_sp);
-					printf("mavlink_receiver(is_loiter_sp):%i\n",is_idle_sp);
-					printf("mavlink_receiver(pos_sp_triplet.current.type):%d\n",pos_sp_triplet.current.type);
+					//printf("mavlink_receiver(is_loiter_sp):%i\n",is_loiter_sp);
+					//printf("mavlink_receiver(is_loiter_sp):%i\n",is_idle_sp);
+					//printf("mavlink_receiver(pos_sp_triplet.current.type):%d\n",pos_sp_triplet.current.type);
 
 					/* set the local pos values */
 					if (!offboard_control_mode.ignore_position) {
