@@ -176,6 +176,7 @@ private:
 		param_t throttle_max;
 		param_t throttle_cruise;
 		param_t throttle_slew_max;
+		param_t throttle_brake;
 
 	} _parameter_handles{};		/**< handles for interesting parameters */
 

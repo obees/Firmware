@@ -143,6 +143,7 @@ GroundRoverPositionControl::parameters_update()
 	param_get(_parameter_handles.throttle_min, &(_parameters.throttle_min));
 	param_get(_parameter_handles.throttle_max, &(_parameters.throttle_max));
 	param_get(_parameter_handles.throttle_cruise, &(_parameters.throttle_cruise));
+	param_get(_parameter_handles.throttle_brake, &(_parameters.throttle_brake));
 
 	_gnd_control.set_l1_damping(_parameters.l1_damping);
 	_gnd_control.set_l1_period(_parameters.l1_period);
@@ -415,7 +416,6 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 			_att_sp.pitch_body = 0.0f;
 			_att_sp.yaw_body = 0.0f;
 			_att_sp.thrust = -throttle_brake;
-
 	 	}
 
 	 	if (was_circle_mode && !_gnd_control.circle_mode()) {
