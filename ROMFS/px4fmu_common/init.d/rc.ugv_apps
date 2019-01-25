@@ -6,9 +6,9 @@
 #
 # Start the attitude and position estimator
 #
-ekf2 start
-# attitude_estimator_q start
-# local_position_estimator start
+# ekf2 start
+attitude_estimator_q start
+local_position_estimator start
 
 
 #
@@ -22,4 +22,4 @@ gnd_pos_control start
 # Start Land Detector
 #
 # Ne sert à rien pour un rover non?
-#land_detector start ugv
+land_detector start ugv

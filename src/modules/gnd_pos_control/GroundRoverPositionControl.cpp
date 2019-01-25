@@ -444,13 +444,6 @@ void
 GroundRoverPositionControl::task_main()
 {
 
-	/* advertise debug value */
-	struct debug_key_value_s dbg = {};
-	memcpy(dbg.key,"obval",6);
-	dbg.value=0.0f;
-
-	orb_advert_t pub_dbg = orb_advertise(ORB_ID(debug_key_value), &dbg);
-
 	_control_mode_sub = orb_subscribe(ORB_ID(vehicle_control_mode));
 	_global_pos_sub = orb_subscribe(ORB_ID(vehicle_global_position));
 	_manual_control_sub = orb_subscribe(ORB_ID(manual_control_setpoint));
@@ -469,8 +462,6 @@ GroundRoverPositionControl::task_main()
 		warnx("aborting startup due to errors.");
 		_task_should_exit = true;
 
-		dbg.value = 1.7;
-		orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
 	}
 
 	/* wakeup source(s) */
@@ -485,13 +476,6 @@ GroundRoverPositionControl::task_main()
 	_task_running = true;
 
 	map_projection_init(&_map_proj_ref, 47.397742, 8.545594);
-
-	
-	dbg.value = 1.5;
-	orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
-
-	dbg.value = _task_should_exit;
-	orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
 
 	while (!_task_should_exit) {
 
@@ -512,9 +496,6 @@ GroundRoverPositionControl::task_main()
 		/* check vehicle control mode for changes to publication state */
 		vehicle_control_mode_poll();
 
-		dbg.value = 1.4;
-	    orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
-
 		/* only update parameters if they changed */
 		if (fds[0].revents & POLLIN) {
 			/* read from param to clear updated flag */
@@ -524,9 +505,6 @@ GroundRoverPositionControl::task_main()
 			/* update parameters from storage */
 			parameters_update();
 		}
-
-		dbg.value = 1.3;
-	    orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
 		
 		/* only run controller if position changed */
 		if (fds[1].revents & POLLIN) {
@@ -571,8 +549,6 @@ GroundRoverPositionControl::task_main()
 			matrix::Vector3f ground_speed(_global_pos.vel_n, _global_pos.vel_e,  _global_pos.vel_d);
 			matrix::Vector2f current_position((float)_global_pos.lat, (float)_global_pos.lon);
 
-			dbg.value = 0.4;
-			orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
 			/*
 			 * Attempt to control position, on success (= sensors present and not in manual mode),
 			 * publish setpoint.
@@ -583,28 +559,21 @@ GroundRoverPositionControl::task_main()
 				Quatf q(Eulerf(_att_sp.roll_body, _att_sp.pitch_body, _att_sp.yaw_body));
 				q.copyTo(_att_sp.q_d);
 				_att_sp.q_d_valid = true;
-				dbg.value = 0.3;
-				orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
 
 				if (!_control_mode.flag_control_offboard_enabled ||
 				    _control_mode.flag_control_position_enabled ||
 				    _control_mode.flag_control_velocity_enabled ||
 				    _control_mode.flag_control_acceleration_enabled) {
 
-					dbg.value = 0.2;
-					orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
 					/* lazily publish the setpoint only once available */
 					if (_attitude_sp_pub != nullptr) {
 						/* publish the attitude setpoint */
 						orb_publish(ORB_ID(vehicle_attitude_setpoint), _attitude_sp_pub, &_att_sp);
-						dbg.value = 0.1;
-						orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
 
 					} else {
 						/* advertise and publish */
 						_attitude_sp_pub = orb_advertise(ORB_ID(vehicle_attitude_setpoint), &_att_sp);
-						dbg.value = 0.01;
-						orb_publish(ORB_ID(debug_key_value), pub_dbg, &dbg);
+
 					}
 				}
 
