@@ -152,6 +152,7 @@ private:
 		float throttle_max;
 		float throttle_cruise;
 		float throttle_slew_max;
+		float throttle_brake;
 
 	} _parameters{};			/**< local copies of interesting parameters */
 
@@ -175,6 +176,7 @@ private:
 		param_t throttle_max;
 		param_t throttle_cruise;
 		param_t throttle_slew_max;
+		param_t throttle_brake;
 
 	} _parameter_handles{};		/**< handles for interesting parameters */
 

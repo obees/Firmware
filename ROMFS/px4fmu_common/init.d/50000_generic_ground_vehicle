@@ -40,6 +40,7 @@ then
 	param set GND_L1_DIST 10
 	param set GND_THR_IDLE 0
 	param set GND_THR_CRUISE 0
+	param set GND_THR_BRAKE 0
 	param set GND_THR_MAX 0.5
 	param set GND_THR_MIN 0
 	param set GND_SPEED_P 0.25

@@ -91,6 +91,7 @@ GroundRoverPositionControl::GroundRoverPositionControl() :
 	_parameter_handles.throttle_min = param_find("GND_THR_MIN");
 	_parameter_handles.throttle_max = param_find("GND_THR_MAX");
 	_parameter_handles.throttle_cruise = param_find("GND_THR_CRUISE");
+	_parameter_handles.throttle_brake = param_find("GND_THR_BRAKE");
 
 	/* fetch initial parameter values */
 	parameters_update();
@@ -142,6 +143,7 @@ GroundRoverPositionControl::parameters_update()
 	param_get(_parameter_handles.throttle_min, &(_parameters.throttle_min));
 	param_get(_parameter_handles.throttle_max, &(_parameters.throttle_max));
 	param_get(_parameter_handles.throttle_cruise, &(_parameters.throttle_cruise));
+	param_get(_parameter_handles.throttle_brake, &(_parameters.throttle_brake));
 
 	_gnd_control.set_l1_damping(_parameters.l1_damping);
 	_gnd_control.set_l1_period(_parameters.l1_period);
@@ -343,6 +345,7 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 		matrix::Vector2f ground_speed_2d = {ground_speed(0), ground_speed(1)};
 
 		float mission_throttle = _parameters.throttle_cruise;
+		float throttle_brake = _parameters.throttle_brake;
 
 		/* Just control the throttle */
 		if (_parameters.speed_control_mode == 1) {
@@ -384,7 +387,7 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 			_att_sp.pitch_body = 0.0f;
 			_att_sp.yaw_body = 0.0f;
 			_att_sp.thrust = 0.0f;
-			printf("%d\n",position_setpoint_s::SETPOINT_TYPE_IDLE);
+			//printf("%d\n",position_setpoint_s::SETPOINT_TYPE_IDLE);
 
 		} else if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_POSITION) {
 
@@ -407,7 +410,13 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 			_att_sp.yaw_body = _gnd_control.nav_bearing();
 			_att_sp.fw_control_yaw = true;
 			_att_sp.thrust = 0.0f;
-		}
+		} else if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_LAND) {
+
+			_att_sp.roll_body = 0.0f;
+			_att_sp.pitch_body = 0.0f;
+			_att_sp.yaw_body = 0.0f;
+			_att_sp.thrust = -throttle_brake;
+	 	}
 
 	 	if (was_circle_mode && !_gnd_control.circle_mode()) {
 			/* just kicked out of loiter, reset integrals */
