@@ -64,6 +64,7 @@
 #include <uORB/topics/vehicle_attitude_setpoint.h>
 #include <uORB/topics/vehicle_control_mode.h>
 #include <uORB/topics/vehicle_global_position.h>
+#include <uORB/topics/vehicle_local_position.h>
 #include <uORB/uORB.h>
 
 using matrix::Dcmf;
@@ -96,11 +97,16 @@ private:
 	orb_advert_t	_attitude_sp_pub{nullptr};		/**< attitude setpoint */
 	orb_advert_t	_gnd_pos_ctrl_status_pub{nullptr};		/**< navigation capabilities publication */
 
+	//struct debug_key_value_s dbg;
+	//orb_advert_t pub_dbg {nullptr};
+
 	bool		_task_should_exit{false};		/**< if true, sensor task should exit */
 	bool		_task_running{false};			/**< if true, task is running in its mainloop */
 
 	int		_control_mode_sub{-1};		/**< control mode subscription */
 	int		_global_pos_sub{-1};
+	int		_local_pos_sub{-1};
+
 	int		_manual_control_sub{-1};		/**< notification of manual control updates */
 	int		_params_sub{-1};			/**< notification of parameter updates */
 	int		_pos_sp_triplet_sub{-1};
@@ -111,6 +117,7 @@ private:
 	vehicle_attitude_setpoint_s		_att_sp{};			/**< vehicle attitude setpoint */
 	vehicle_control_mode_s			_control_mode{};			/**< control mode */
 	vehicle_global_position_s		_global_pos{};			/**< global vehicle position */
+	vehicle_local_position_s		_local_pos{};
 
 	Subscription<vehicle_attitude_s>	_sub_attitude;
 	Subscription<sensor_bias_s>	_sub_sensors;
@@ -125,6 +132,9 @@ private:
 
 	// estimator reset counters
 	uint8_t _pos_reset_counter{0};		// captures the number of times the estimator has reset the horizontal position
+
+	// previous setpoint
+	position_setpoint_s previous_setpoint{};
 
 	ECL_L1_Pos_Controller				_gnd_control;
 
@@ -199,6 +209,9 @@ private:
 	 * Control position.
 	 */
 	bool		control_position(const matrix::Vector2f &global_pos, const matrix::Vector3f &ground_speed,
+					 const position_setpoint_triplet_s &_pos_sp_triplet);
+
+	bool		control_position_xy(const matrix::Vector2f &local_pos, const matrix::Vector3f &ground_speed,
 					 const position_setpoint_triplet_s &_pos_sp_triplet);
 
 	/**

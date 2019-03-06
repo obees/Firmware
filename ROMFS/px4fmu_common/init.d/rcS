@@ -911,7 +911,7 @@ fi
 	#
 	# Start the navigator
 	#
-	navigator start
+	# navigator start
 
 	#
 	# Generic setup (autostart ID not found)
