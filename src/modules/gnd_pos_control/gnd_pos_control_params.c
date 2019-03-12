@@ -109,6 +109,21 @@ PARAM_DEFINE_FLOAT(GND_L1_DAMPING, 0.75f);
 PARAM_DEFINE_FLOAT(GND_THR_CRUISE, 0.1f);
 
 /**
+ * Cruise throttle
+ *
+ * This is the throttle setting required to achieve the desired cruise speed.
+ * 10% is ok for a traxxas stampede vxl with ESC set to training mode
+ *
+ * @unit norm
+ * @min 0.0
+ * @max 1.0
+ * @decimal 2
+ * @increment 0.01
+ * @group GND POS Control
+ */
+PARAM_DEFINE_FLOAT(GND_THR_BRAKE, 0.1f);
+
+/**
  * Throttle limit max
  *
  * This is the maximum throttle % that can be used by the controller.

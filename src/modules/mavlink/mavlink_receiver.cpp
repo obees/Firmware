@@ -917,8 +917,11 @@ MavlinkReceiver::handle_message_set_position_target_local_ned(mavlink_message_t 
 
 		bool is_takeoff_sp = (bool)(set_position_target_local_ned.type_mask & 0x1000);
 		bool is_land_sp = (bool)(set_position_target_local_ned.type_mask & 0x2000);
-		bool is_loiter_sp = (bool)(set_position_target_local_ned.type_mask & 0x3000);
-		bool is_idle_sp = (bool)(set_position_target_local_ned.type_mask & 0x4000);
+		// bool is_loiter_sp = (bool)(set_position_target_local_ned.type_mask & 0x3000);
+		// bool is_idle_sp = (bool)(set_position_target_local_ned.type_mask & 0x4000);
+		bool is_loiter_sp = (bool)(set_position_target_local_ned.type_mask & 0x4000);
+		bool is_idle_sp = (bool)(set_position_target_local_ned.type_mask & 0x8000);
+
 
 		offboard_control_mode.timestamp = hrt_absolute_time();
 
@@ -971,12 +974,19 @@ MavlinkReceiver::handle_message_set_position_target_local_ned(mavlink_message_t 
 						pos_sp_triplet.current.type = position_setpoint_s::SETPOINT_TYPE_POSITION;
 					}
 
+					
+					//printf("mavlink_receiver(is_loiter_sp):%i\n",is_loiter_sp);
+					//printf("mavlink_receiver(is_loiter_sp):%i\n",is_idle_sp);
+					//printf("mavlink_receiver(pos_sp_triplet.current.type):%d\n",pos_sp_triplet.current.type);
+
 					/* set the local pos values */
 					if (!offboard_control_mode.ignore_position) {
 						pos_sp_triplet.current.position_valid = true;
 						pos_sp_triplet.current.x = set_position_target_local_ned.x;
 						pos_sp_triplet.current.y = set_position_target_local_ned.y;
 						pos_sp_triplet.current.z = set_position_target_local_ned.z;
+
+
 
 					} else {
 						pos_sp_triplet.current.position_valid = false;
@@ -1844,7 +1854,7 @@ MavlinkReceiver::handle_message_heartbeat(mavlink_message_t *msg)
 int
 MavlinkReceiver::set_message_interval(int msgId, float interval, int data_rate)
 {
-	if (msgId == 0) {
+	if (msgId == MAVLINK_MSG_ID_HEARTBEAT) {
 		return PX4_ERROR;
 	}
 
@@ -1853,18 +1863,16 @@ MavlinkReceiver::set_message_interval(int msgId, float interval, int data_rate)
 	}
 
 	// configure_stream wants a rate (msgs/second), so convert here.
-	float rate = 0;
+	float rate = 0.f;
 
-	if (interval < 0) {
-		// stop the stream.
-		rate = 0;
+	if (interval < -0.00001f) {
+		rate = 0.f; // stop the stream
 
-	} else if (interval > 0) {
+	} else if (interval > 0.00001f) {
 		rate = 1000000.0f / interval;
 
 	} else {
-		// note: mavlink spec says rate == 0 is requesting a default rate but our streams
-		// don't publish a default rate so for now let's pick a default rate of zero.
+		rate = -2.f; // set default rate
 	}
 
 	bool found_id = false;
@@ -2546,7 +2554,7 @@ MavlinkReceiver::receive_thread(void *arg)
 				// could be TCP or other protocol
 			}
 
-			struct sockaddr_in *srcaddr_last = _mavlink->get_client_source_address();
+			struct sockaddr_in &srcaddr_last = _mavlink->get_client_source_address();
 
 			int localhost = (127 << 24) + 1;
 
@@ -2558,9 +2566,9 @@ MavlinkReceiver::receive_thread(void *arg)
 				hrt_abstime stime = _mavlink->get_start_time();
 
 				if ((stime != 0 && (hrt_elapsed_time(&stime) > 3 * 1000 * 1000))
-				    || (srcaddr_last->sin_addr.s_addr == htonl(localhost))) {
-					srcaddr_last->sin_addr.s_addr = srcaddr.sin_addr.s_addr;
-					srcaddr_last->sin_port = srcaddr.sin_port;
+				    || (srcaddr_last.sin_addr.s_addr == htonl(localhost))) {
+					srcaddr_last.sin_addr.s_addr = srcaddr.sin_addr.s_addr;
+					srcaddr_last.sin_port = srcaddr.sin_port;
 					_mavlink->set_client_source_initialized();
 					PX4_INFO("partner IP: %s", inet_ntoa(srcaddr.sin_addr));
 				}

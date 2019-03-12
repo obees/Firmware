@@ -120,7 +120,7 @@ GroundRoverAttitudeControl::parameters_update()
 	param_get(_parameter_handles.bat_scale_en, &_parameters.bat_scale_en);
 
 	/* Steering pid parameters*/
-	pid_init(&_steering_ctrl, PID_MODE_DERIVATIV_SET, 0.01f);
+	pid_init(&_steering_ctrl, PID_MODE_DERIVATIV_CALC, 0.01f);
 	pid_set_parameters(&_steering_ctrl,
 			   _parameters.w_p,
 			   _parameters.w_i,

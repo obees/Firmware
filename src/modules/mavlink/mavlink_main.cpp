@@ -2012,6 +2012,8 @@ Mavlink::task_main(int argc, char *argv[])
 
 	}
 
+        const float unlimited_rate = -1.f;
+
 	switch (_mode) {
 	case MAVLINK_MODE_NORMAL:
 		configure_stream("ADSB_VEHICLE");
@@ -2045,42 +2047,42 @@ Mavlink::task_main(int argc, char *argv[])
 		break;
 
 	case MAVLINK_MODE_ONBOARD:
-		configure_stream("ACTUATOR_CONTROL_TARGET0", 10.0f);
-		configure_stream("ADSB_VEHICLE");
-		configure_stream("ALTITUDE", 10.0f);
-		configure_stream("ATTITUDE", 100.0f);
-		configure_stream("ATTITUDE_QUATERNION", 50.0f);
-		configure_stream("ATTITUDE_TARGET", 10.0f);
-		configure_stream("CAMERA_CAPTURE", 2.0f);
-		configure_stream("CAMERA_IMAGE_CAPTURED");
-		configure_stream("CAMERA_TRIGGER");
-		configure_stream("COLLISION");
-		configure_stream("DEBUG", 10.0f);
-		configure_stream("DEBUG_VECT", 10.0f);
-		configure_stream("DISTANCE_SENSOR", 10.0f);
-		configure_stream("ESTIMATOR_STATUS", 1.0f);
-		configure_stream("EXTENDED_SYS_STATE", 5.0f);
-		configure_stream("GLOBAL_POSITION_INT", 50.0f);
-		configure_stream("GPS_RAW_INT");
-		configure_stream("HIGHRES_IMU", 50.0f);
-		configure_stream("HOME_POSITION", 0.5f);
-		configure_stream("LOCAL_POSITION_NED", 30.0f);
-		configure_stream("NAMED_VALUE_FLOAT", 10.0f);
-		configure_stream("NAV_CONTROLLER_OUTPUT", 10.0f);
-		configure_stream("OPTICAL_FLOW_RAD", 10.0f);
-		configure_stream("PING", 1.0f);
-		configure_stream("POSITION_TARGET_GLOBAL_INT", 10.0f);
-		configure_stream("POSITION_TARGET_LOCAL_NED", 10.0f);
-		configure_stream("RC_CHANNELS", 20.0f);
-		configure_stream("SCALED_IMU", 50.0f);
-		configure_stream("SERVO_OUTPUT_RAW_0", 10.0f);
-		configure_stream("SYS_STATUS", 5.0f);
-		configure_stream("SYSTEM_TIME", 1.0f);
-		configure_stream("TIMESYNC", 10.0f);
-		configure_stream("VFR_HUD", 10.0f);
-		configure_stream("VISION_POSITION_ESTIMATE", 10.0f);
-		configure_stream("WIND_COV", 10.0f);
-		break;
+                configure_stream("ACTUATOR_CONTROL_TARGET0", 10.0f);
+                configure_stream("ADSB_VEHICLE", unlimited_rate);
+                configure_stream("ALTITUDE", 10.0f);
+                configure_stream("ATTITUDE", 10.0f); // 100
+                configure_stream("ATTITUDE_QUATERNION", 10.0f);
+                configure_stream("ATTITUDE_TARGET", 10.0f);
+                //configure_stream("CAMERA_CAPTURE", 2.0f);
+                //configure_stream("CAMERA_IMAGE_CAPTURED", c);
+                //configure_stream("CAMERA_TRIGGER", unlimited_rate);
+                //configure_stream("COLLISION", unlimited_rate);
+                configure_stream("DEBUG", 10.0f);
+                configure_stream("DEBUG_VECT", 10.0f);
+                //configure_streaml("DISTANCE_SENSOR", 10.0f);
+                configure_stream("ESTIMATOR_STATUS", 1.0f);
+                configure_stream("EXTENDED_SYS_STATE", 5.0f);
+                //configure_stream("GLOBAL_POSITION_INT", 50.0f);
+                //configure_stream("GPS_RAW_INT", unlimited_rate);
+                //configure_stream("HIGHRES_IMU", 50.0f);
+                //configure_stream("HOME_POSITION", 0.5f);
+                configure_stream("LOCAL_POSITION_NED", 50.0f); // 50
+                configure_stream("NAMED_VALUE_FLOAT", 10.0f);
+                //configure_stream("NAV_CONTROLLER_OUTPUT", 10.0f);
+                //configure_stream("OPTICAL_FLOW_RAD", 10.0f);
+                configure_stream("PING", 1.0f);
+                configure_stream("POSITION_TARGET_GLOBAL_INT", 10.0f);
+                configure_stream("POSITION_TARGET_LOCAL_NED", 10.0f);
+                configure_stream("RC_CHANNELS", 20.0f);
+                //configure_stream("SCALED_IMU", 50.0f);
+                configure_stream("SERVO_OUTPUT_RAW_0", 10.0f);
+                configure_stream("SYS_STATUS", 5.0f);
+                configure_stream("SYSTEM_TIME", 1.0f);
+                configure_stream("TIMESYNC", 10.0f);
+                configure_stream("VFR_HUD", 10.0f);
+                //configure_stream("VISION_POSITION_ESTIMATE", 10.0f);
+                //configure_stream("WIND_COV", 10.0f);
+                break;
 
 	case MAVLINK_MODE_OSD:
 		configure_stream("ALTITUDE", 1.0f);

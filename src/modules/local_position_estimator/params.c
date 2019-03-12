@@ -356,7 +356,7 @@ PARAM_DEFINE_INT32(LPE_FAKE_ORIGIN, 0);
  * @max 90
  * @decimal 8
  */
-PARAM_DEFINE_FLOAT(LPE_LAT, 47.397742f);
+PARAM_DEFINE_FLOAT(LPE_LAT, 47.3977f);
 
 /**
  * Local origin longitude for nav w/o GPS
@@ -367,7 +367,7 @@ PARAM_DEFINE_FLOAT(LPE_LAT, 47.397742f);
  * @max 180
  * @decimal 8
  */
-PARAM_DEFINE_FLOAT(LPE_LON, 8.545594);
+PARAM_DEFINE_FLOAT(LPE_LON, 8.5455);
 
 /**
  * Cut frequency for state publication
