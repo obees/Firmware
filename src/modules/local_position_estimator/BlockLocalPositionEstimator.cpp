@@ -9,9 +9,9 @@
 orb_advert_t mavlink_log_pub = nullptr;
 
 // required standard deviation of estimate for estimator to publish data
-static const uint32_t		EST_STDDEV_XY_VALID = 2.0;	// 2.0 m
-static const uint32_t		EST_STDDEV_Z_VALID = 2.0;	// 2.0 m
-static const uint32_t		EST_STDDEV_TZ_VALID = 2.0;	// 2.0 m
+static const uint32_t		EST_STDDEV_XY_VALID = 0.1;	// 2.0 m
+static const uint32_t		EST_STDDEV_Z_VALID = 0.1;	// 2.0 m
+static const uint32_t		EST_STDDEV_TZ_VALID = 0.1;	// 2.0 m
 
 static const float P_MAX = 1.0e6f;	// max allowed value in state covariance
 static const float LAND_RATE = 10.0f;	// rate of land detector correction
