@@ -383,9 +383,10 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 
 	 	
 	 	if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_IDLE) {
-			_att_sp.roll_body = 0.0f;
+			_gnd_control.navigate_waypoints(prev_wp, curr_wp, current_position, ground_speed_2d);
+			_att_sp.roll_body = _gnd_control.nav_roll();
 			_att_sp.pitch_body = 0.0f;
-			_att_sp.yaw_body = 0.0f;
+			_att_sp.yaw_body = _gnd_control.nav_bearing();
 			_att_sp.thrust = 0.0f;
 			//printf("%d\n",position_setpoint_s::SETPOINT_TYPE_IDLE);
 
@@ -414,9 +415,10 @@ GroundRoverPositionControl::control_position(const matrix::Vector2f &current_pos
 			_att_sp.thrust = 0.0f;
 		} else if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_LAND) {
 
-			_att_sp.roll_body = 0.0f;
+			_gnd_control.navigate_waypoints(prev_wp, curr_wp, current_position, ground_speed_2d);
+			_att_sp.roll_body = _gnd_control.nav_roll();
 			_att_sp.pitch_body = 0.0f;
-			_att_sp.yaw_body = 0.0f;
+			_att_sp.yaw_body = _gnd_control.nav_bearing();
 			_att_sp.thrust = -throttle_brake;
 	 	}
 
@@ -517,9 +519,10 @@ GroundRoverPositionControl::control_position_xy(const matrix::Vector2f &current_
 
 	 	
 	 	if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_IDLE) {
-			_att_sp.roll_body = 0.0f;
+			_gnd_control.navigate_waypoints_xy(prev_wp, curr_wp, current_position, ground_speed_2d);
+			_att_sp.roll_body = _gnd_control.nav_roll();
 			_att_sp.pitch_body = 0.0f;
-			_att_sp.yaw_body = 0.0f;
+			_att_sp.yaw_body = _gnd_control.nav_bearing();
 			_att_sp.thrust = 0.0f;
 			//printf("%d\n",position_setpoint_s::SETPOINT_TYPE_IDLE);
 
@@ -547,10 +550,10 @@ GroundRoverPositionControl::control_position_xy(const matrix::Vector2f &current_
 			_att_sp.fw_control_yaw = true;
 			_att_sp.thrust = 0.0f;
 		} else if (pos_sp_triplet.current.type == position_setpoint_s::SETPOINT_TYPE_LAND) {
-
-			_att_sp.roll_body = 0.0f;
+			_gnd_control.navigate_waypoints_xy(prev_wp, curr_wp, current_position, ground_speed_2d);
+			_att_sp.roll_body = _gnd_control.nav_roll();
 			_att_sp.pitch_body = 0.0f;
-			_att_sp.yaw_body = 0.0f;
+			_att_sp.yaw_body = _gnd_control.nav_bearing();
 			_att_sp.thrust = -throttle_brake;
 	 	}
 
