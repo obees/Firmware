@@ -71,6 +71,8 @@
 #include "Utility/ControlMath.hpp"
 #include "Takeoff.hpp"
 
+#include <uORB/topics/debug_vect.h>
+
 using namespace time_literals;
 
 /**
@@ -480,6 +482,13 @@ MulticopterPositionControl::run()
 	poll_fd.fd = _local_pos_sub;
 	poll_fd.events = POLLIN;
 
+	struct debug_vect_s dbg;
+	// dbg.x = 0.0f;
+	// dbg.y = 0.0f;
+	// dbg.z = 0.0f;
+	std::strcpy(dbg.name, "xyzvect");
+	orb_advert_t pub_dbg = orb_advertise(ORB_ID(debug_vect), &dbg);
+
 	while (!should_exit()) {
 		// poll for new data on the local position state topic (wait for up to 20ms)
 		const int poll_return = px4_poll(&poll_fd, 1, 20);
@@ -548,22 +557,34 @@ MulticopterPositionControl::run()
 
 			} else {
 				setpoint = _flight_tasks.getPositionSetpoint();
+				// Getting setpoint data
+				// dbg.x = setpoint.x;
+				// dbg.y = setpoint.y;
+				// dbg.z = setpoint.z;
+				// orb_publish(ORB_ID(debug_vect), pub_dbg, &dbg);
+
 				_failsafe_land_hysteresis.set_state_and_update(false, time_stamp_current);
 
 				// Check if position, velocity or thrust pairs are valid -> trigger failsaife if no pair is valid
 				if (!(PX4_ISFINITE(setpoint.x) && PX4_ISFINITE(setpoint.y)) &&
 				    !(PX4_ISFINITE(setpoint.vx) && PX4_ISFINITE(setpoint.vy)) &&
 				    !(PX4_ISFINITE(setpoint.thrust[0]) && PX4_ISFINITE(setpoint.thrust[1]))) {
+					PX4_INFO("position, velocity or thrust pairs are valid -> trigger failsaife if no pair is valid");
 					failsafe(setpoint, _states, true, !was_in_failsafe);
 				}
 
 				// Check if altitude, climbrate or thrust in D-direction are valid -> trigger failsafe if none
 				// of these setpoints are valid
 				if (!PX4_ISFINITE(setpoint.z) && !PX4_ISFINITE(setpoint.vz) && !PX4_ISFINITE(setpoint.thrust[2])) {
+					PX4_INFO("altitude, climbrate or thrust in D-direction are valid -> trigger failsafe if none of these setpoints are valid");
 					failsafe(setpoint, _states, true, !was_in_failsafe);
 				}
 			}
-
+			// #1 - OK
+			// dbg.x = setpoint.x;
+			// dbg.y = setpoint.y;
+			// dbg.z = setpoint.z;
+			// orb_publish(ORB_ID(debug_vect), pub_dbg, &dbg);
 			// publish trajectory setpoint
 			_traj_sp_pub.publish(setpoint);
 
@@ -592,6 +613,13 @@ MulticopterPositionControl::run()
 				// reactivate the task which will reset the setpoint to current state
 				_flight_tasks.reActivate();
 			}
+
+			// #3 - ???
+			dbg.x = setpoint.x;
+			dbg.y = setpoint.y;
+			dbg.z = setpoint.z;
+			orb_publish(ORB_ID(debug_vect), pub_dbg, &dbg);
+			// publish trajectory setpoint
 
 			if (_takeoff.getTakeoffState() < TakeoffState::flight && !PX4_ISFINITE(setpoint.thrust[2])) {
 				constraints.tilt = math::radians(_param_mpc_tiltmax_lnd.get());
@@ -624,6 +652,13 @@ MulticopterPositionControl::run()
 			// If the desired setpoint has a velocity-setpoint only, then _local_pos_sp will contain valid velocity- and thrust-setpoint, but the position-setpoint
 			// will remain NAN. Given that the PositionController cannot generate a position-setpoint, this type of setpoint is always equal to the input to the
 			// PositionController.
+
+			// #2 - NAN
+			// dbg.x = setpoint.x;
+			// dbg.y = setpoint.y;
+			// dbg.z = setpoint.z;
+			// orb_publish(ORB_ID(debug_vect), pub_dbg, &dbg);
+
 			vehicle_local_position_setpoint_s local_pos_sp{};
 			local_pos_sp.timestamp = hrt_absolute_time();
 			local_pos_sp.x = setpoint.x;
@@ -639,6 +674,10 @@ MulticopterPositionControl::run()
 			// Publish local position setpoint
 			// This message will be used by other modules (such as Landdetector) to determine
 			// vehicle intention.
+			// dbg.x = setpoint.x;
+			// dbg.y = setpoint.y;
+			// dbg.z = setpoint.z;
+			// orb_publish(ORB_ID(debug_vect), pub_dbg, &dbg);
 			_local_pos_sp_pub.publish(local_pos_sp);
 
 			// Inform FlightTask about the input and output of the velocity controller
@@ -663,6 +702,10 @@ MulticopterPositionControl::run()
 			// an attitude setpoint is because for non-flighttask modes
 			// the attitude septoint should come from another source, otherwise
 			// they might conflict with each other such as in offboard attitude control.
+			// dbg.x = setpoint.x;
+			// dbg.y = setpoint.y;
+			// dbg.z = setpoint.z;
+			// orb_publish(ORB_ID(debug_vect), pub_dbg, &dbg);
 			publish_attitude();
 
 			// if there's any change in landing gear setpoint publish it

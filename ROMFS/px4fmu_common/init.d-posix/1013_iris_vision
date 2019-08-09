@@ -26,3 +26,6 @@ then
 	# AEQ: External heading set to use vision input
 	param set ATT_EXT_HDG_M 1
 fi
+
+param set MAV_BROADCAST 1
+param set CBRK_SUPPLY_CHK 894281

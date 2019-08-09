@@ -437,7 +437,7 @@ else
 	#
 	# Start the navigator.
 	#
-	navigator start
+	# navigator start
 
 	#
 	# Start the standalone wind estimator.

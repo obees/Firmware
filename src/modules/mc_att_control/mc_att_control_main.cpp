@@ -52,6 +52,8 @@
 #include <mathlib/math/Limits.hpp>
 #include <mathlib/math/Functions.hpp>
 
+#include <uORB/topics/debug_vect.h>
+
 #define TPA_RATE_LOWER_LIMIT 0.05f
 
 #define AXIS_INDEX_ROLL 0
@@ -579,6 +581,13 @@ MulticopterAttitudeControl::run()
 
 	bool reset_yaw_sp = true;
 	float attitude_dt = 0.f;
+
+	// struct debug_vect_s dbg;
+	// dbg.x = 0.0f;
+	// dbg.y = 0.0f;
+	// dbg.z = 0.0f;
+	// std::strcpy(dbg.name, "xyzvect");
+	// orb_advert_t pub_dbg = orb_advertise(ORB_ID(debug_vect), &dbg);
 
 	while (!should_exit()) {
 
