@@ -478,6 +478,14 @@ void VtolAttitudeControl::task_main()
 			Vector3f().copyTo(_v_att_sp.thrust_body);
 		}
 
+		// reinitialize the setpoint while not armed to make sure no value from the last mode or flight is still kept
+		if (!_v_control_mode.flag_armed) {
+			Quatf().copyTo(_mc_virtual_att_sp.q_d);
+			Vector3f().copyTo(_mc_virtual_att_sp.thrust_body);
+			Quatf().copyTo(_v_att_sp.q_d);
+			Vector3f().copyTo(_v_att_sp.thrust_body);
+		}
+
 		/* Only publish if the proper mode(s) are enabled */
 		if (_v_control_mode.flag_control_attitude_enabled ||
 		    _v_control_mode.flag_control_rates_enabled ||
