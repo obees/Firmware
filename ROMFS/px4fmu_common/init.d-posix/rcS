@@ -209,7 +209,7 @@ tone_alarm start
 gpssim start
 sensors start
 commander start
-navigator start
+# navigator start
 
 if param compare WEST_EN 1
 then
