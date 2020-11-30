@@ -9,6 +9,7 @@ sh /etc/init.d-posix/10016_iris
 
 if [ $AUTOCNF = yes ]
 then
-	param set COM_OBS_AVOID 1
-	param set MPC_XY_CRUISE 5.0
+	param set COM_OBS_AVOID 0
+	param set MPC_XY_CRUISE 6.0
+	param set CP_DIST 10.0
 fi
