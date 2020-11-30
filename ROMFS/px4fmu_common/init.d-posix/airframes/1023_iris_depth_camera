@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# @name 3DR Iris Quadrotor SITL (Obstacle Avoidance)
+#
+# @type Quadrotor Wide
+#
+
+. ${R}etc/init.d-posix/airframes/10016_iris
+
+if [ $AUTOCNF = yes ]
+then
+	echo "########################## INSIDE AUTOCONF"
+
+	# les infos de coordonnees "desired" viennent du px4
+	param set COM_OBS_AVOID 1
+	param set MPC_XY_CRUISE 5.0
+	param set CP_DIST 1.0
+fi
+echo "########################### OUTSIDE AUTOCONF"
+# param set COM_OBS_AVOID 1
+# param set MPC_XY_CRUISE 8.0
+# param set CP_DIST 3.0
+param set EKF2_AID_MASK 25
+param set EKF2_EV_DELAY 5

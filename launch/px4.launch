@@ -5,7 +5,7 @@
 
     <!-- PX4 config arguments -->
     <arg name="est" default="ekf2"/>
-    <arg name="vehicle" default="iris"/>
+    <arg name="vehicle" default="iris_depth_camera"/>
     <arg name="ID" default="0"/>
     <arg name="interactive" default="true"/>
 
