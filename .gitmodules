@@ -2,17 +2,9 @@
 	path = mavlink/include/mavlink/v2.0
 	url = https://github.com/mavlink/c_library_v2.git
 	branch = master
-[submodule "src/drivers/uavcan/libuavcan"]
-	path = src/drivers/uavcan/libuavcan
-	url = https://github.com/PX4/uavcan.git
-	branch = px4
 [submodule "Tools/jMAVSim"]
 	path = Tools/jMAVSim
 	url = https://github.com/PX4/jMAVSim.git
-	branch = master
-[submodule "Tools/sitl_gazebo"]
-	path = Tools/sitl_gazebo
-	url = https://github.com/PX4/PX4-SITL_gazebo.git
 	branch = master
 [submodule "src/lib/matrix"]
 	path = src/lib/matrix
@@ -54,3 +46,11 @@
 [submodule "src/examples/gyro_fft/CMSIS_5"]
 	path = src/examples/gyro_fft/CMSIS_5
 	url = https://github.com/ARM-software/CMSIS_5.git
+[submodule "src/drivers/uavcan/libuavcan"]
+	path = src/drivers/uavcan/libuavcan
+	url = https://github.com/PX4/libuavcan.git
+	branch = px4
+[submodule "Tools/PX4-SITL_gazebo"]
+	path = Tools/PX4-SITL_gazebo
+	url = https://github.com/obees/PX4-SITL_gazebo.git
+	branch = master
